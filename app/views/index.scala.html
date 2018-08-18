@@ -1,0 +1,83 @@
+@(braintreeClientToken: String)
+
+
+@main("Welcome to Play")(braintreeClientToken: String) {
+
+<div class="row container">
+  <div class="col-md-12">
+    <div class="row box_style_3" id="creditCardBox">
+      <div class="row">
+        <div class="col-md-4" style="text-align: right;">
+          <label>Name on Credit Card:</label>
+        </div>
+        <div class="col-md-8">
+          <input class="form-control" id="nameOnCCCard" autocomplete="off" tabindex="13">
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-md-2" style="text-align: right;">
+          <label id="ccNumberLabel">Card Number:</label>
+        </div>
+        <div class="col-md-5">
+          <input class="form-control" id="ccNumber" placeholder="#### #### #### ####" data-stripe="number" autocomplete="off" tabindex="14">
+        </div>
+        <div class="col-md-2" style="text-align: right;">
+          <label id="cvcNumberLabel">CVC:</label>
+        </div>
+        <div class="col-md-3">
+          <input class="form-control" id="cvcNumber" placeholder="####" data-stripe="cvc" autocomplete="off" tabindex="15">
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-md-2" style="text-align: right;">
+          <label id="expMonthLabel">Expiration Month:</label>
+        </div>
+        <div class="col-md-5">
+          <div class="styled-select" id="expMonthStyle">
+            <select id="expMonth" data-stripe="exp-month" autocomplete="expMonth" tabindex="16">
+              <option value="1">Jan (01)</option>
+              <option value="2">Feb (02)</option>
+              <option value="3">Mar (03)</option>
+              <option value="4">Apr (04)</option>
+              <option value="5">May (05)</option>
+              <option value="6">Jun (06)</option>
+              <option value="7">Jul (07)</option>
+              <option value="8">Aug (08)</option>
+              <option value="9">Sep (09)</option>
+              <option value="10">Oct (10)</option>
+              <option value="11">Nov (11)</option>
+              <option value="12 selected">Dec (12)</option>
+            </select>
+          </div>
+        </div>
+        <div class="col-md-1" style="text-align: right;">
+          <label id="expYearLabel">Year:</label>
+        </div>
+        <div class="col-md-4">
+          <div class="styled-select" id="expYearStyle">
+            <select id="expYear" data-stripe="exp-year" autocomplete="expYear" tabindex="17">
+            @for(index <- 0 to 9) {
+              <option value="@{2018 + index}"
+              @if(index == 0) {
+                selected
+              }
+              >@{
+                2018 + index
+              }
+              </option>
+            }
+            </select>
+          </div>
+        </div>
+      </div>
+      <br/>
+      <div class="col-md-12 text-center" >
+        <button type="button" class="btn btn-info" data-dismiss="modal" onclick="handlePayViaBraintree()">
+          Pay
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+}

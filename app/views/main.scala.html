@@ -1,0 +1,36 @@
+@*
+ * This template is called from the `index` template. This template
+ * handles the rendering of the page header and body tags. It takes
+ * two arguments, a `String` for the title of the page and an `Html`
+ * object to insert into the body of the page.
+ *@
+@(title: String)(braintreeClientToken: String)(content: Html)
+
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>@title</title>
+        <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1, maximum-scale=1, user-scalable=no">
+        <link href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous" >
+        <link rel="stylesheet" href="//code.jquery.com/ui/1.12.0/themes/base/jquery-ui.css">
+    </head>
+    <body>
+        @* And here's where we render the `Html` object containing
+         * the page content. *@
+        @content
+
+        <!-- JQUERY -->
+      <script src="//ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
+        <!-- BOOTSTRAP -->
+      <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+      <script type="text/javascript" src="@controllers.routes.Application.javascriptRoutes" type="text/javascript"></script>
+      <script>
+          var braintreeClientToken = "@braintreeClientToken";
+      </script>
+      <script src="@routes.Assets.versioned("javascripts/braintree.js")"></script>
+        <!-- Load the Client component. -->
+      <script src="https://js.braintreegateway.com/web/3.15.0/js/client.min.js"></script>
+      <script src="@routes.Assets.versioned("javascripts/jquery.inputmask.bundle.js")"></script>
+      <script src="@routes.Assets.versioned("javascripts/jquery-ui.js")"></script>
+    </body>
+</html>
