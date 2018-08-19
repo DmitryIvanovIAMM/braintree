@@ -21,7 +21,9 @@ function addInputMasks() {
 var ccMask = [{ "mask": "#### #### #### ####"}];
 var cvcMask = [{ "mask": "####"}];
 
-
+// get Braintree payment nonce as described here:
+// https://braintree.github.io/braintree-web/current/Client.html#request
+// Direct Credit Card Tokenization
 function handlePayViaBraintree() {
   var ccNumber = getCCNumberFromForm('ccNumber');
   var cvcNumber = getCVCNumberFromForm('cvcNumber');

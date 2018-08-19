@@ -59,7 +59,6 @@ class Application @Inject()(val jsonFormatters: JsonFormatters,
   }
 
   private def getBraintreeGateway() = {
-
     new BraintreeGateway(
       queryBraintreeEnvironmentMode,
       "zxb9qhkjv6dcwsmn",                // merchantId
@@ -85,9 +84,44 @@ class Application @Inject()(val jsonFormatters: JsonFormatters,
   private def processBraintreePayment(nonceFromTheClient: String): String = {
     val gateway = getBraintreeGateway()
 
-    val request = new TransactionRequest()
+    // case 1
+    // direct copy from
+    // https://github.com/braintree/braintree_java
+    // results:
+    // with test data: payment success
+    // with real data: Error processing transaction. Status: PROCESSOR_DECLINED.  Code: 2026.  Text: Invalid Merchant ID
+    /*val request = new TransactionRequest()
       .amount(BigDecimal(1.0).bigDecimal)
-      //.merchantAccountId("BMOutsourcingLLC_instant") // optional
+      .paymentMethodNonce(nonceFromTheClient)
+      .options
+        .submitForSettlement(true)
+        .done
+
+    val result = gateway.transaction().sale(request)
+
+    if ( !result.isSuccess() ) {
+      if (result.getTransaction() != null) {
+        val transaction: Transaction = result.getTransaction()
+        info(s"Error processing transaction. Status: ${transaction.getStatus}.  Code: ${transaction.getProcessorResponseCode}.  Text: ${transaction.getProcessorResponseText}")
+        s"Error processing transaction. Status: ${transaction.getStatus}.  Code: ${transaction.getProcessorResponseCode}.  Text: ${transaction.getProcessorResponseText}"
+      } else {
+        val errors = result.getErrors.getAllDeepValidationErrors.map(_.getMessage).mkString(", ")
+        errors
+      }
+    } else {
+      "payment success"
+    }*/
+
+    // case 2
+    // copy from
+    // https://github.com/braintree/braintree_java
+    // but add customer fields
+    // results:
+    // with test data: payment success
+    // with real data: Error processing transaction. Status: PROCESSOR_DECLINED.  Code: 2026.  Text: Invalid Merchant ID
+    /*val request = new TransactionRequest()
+      .amount(BigDecimal(1.0).bigDecimal)
+      .paymentMethodNonce(nonceFromTheClient)
       .customer
         .firstName("CustomerTestFirstName")
         .lastName("CustomerTestLastName")
@@ -102,18 +136,56 @@ class Application @Inject()(val jsonFormatters: JsonFormatters,
       if (result.getTransaction() != null) {
         val transaction: Transaction = result.getTransaction()
         info(s"Error processing transaction. Status: ${transaction.getStatus}.  Code: ${transaction.getProcessorResponseCode}.  Text: ${transaction.getProcessorResponseText}")
-        //throw new Exception(s"Error processing transaction. Status: ${transaction.getStatus}.  Code: ${transaction.getProcessorResponseCode}.  Text: ${transaction.getProcessorResponseText}")
         s"Error processing transaction. Status: ${transaction.getStatus}.  Code: ${transaction.getProcessorResponseCode}.  Text: ${transaction.getProcessorResponseText}"
       } else {
-        //val errors = result.getErrors.getAllDeepValidationErrors.map(_.getMessage).mkString(" ")
         val errors = result.getErrors.getAllDeepValidationErrors.map(_.getMessage).mkString(", ")
-        //info("Multiple deep validation errors")
-        //throw new Exception("Multiple deep validation errors")
         errors
       }
     } else {
-      "payment correct"
+      "payment success"
+    }*/
+
+    // case 3
+    // copy from
+    // https://github.com/braintree/braintree_java
+    // but before payment create Braintree customer with setting default payment method
+    // with test data: payment success
+    // with real data: Error processing transaction. Status: PROCESSOR_DECLINED.  Code: 2026.  Text: Invalid Merchant ID
+    val contactRequest = new CustomerRequest()
+      .firstName("CustomerTestFirstName")
+      .lastName("CustomerTestLastName")
+      .paymentMethodNonce(nonceFromTheClient)
+
+    val result = gateway.customer.create(contactRequest)
+
+    if ( result.isSuccess() ) {
+      val brainTreeCustomerId = result.getTarget.getId
+
+      val request = new TransactionRequest()
+        .amount(BigDecimal(1.0).bigDecimal)
+        .customerId(brainTreeCustomerId)
+        .options
+          .submitForSettlement(true)
+          .done
+
+      val result2 = gateway.transaction().sale(request)
+
+      if ( !result2.isSuccess() ) {
+        if (result2.getTransaction() != null) {
+          val transaction: Transaction = result2.getTransaction()
+          info(s"Error processing transaction. Status: ${transaction.getStatus}.  Code: ${transaction.getProcessorResponseCode}.  Text: ${transaction.getProcessorResponseText}")
+          s"Error processing transaction. Status: ${transaction.getStatus}.  Code: ${transaction.getProcessorResponseCode}.  Text: ${transaction.getProcessorResponseText}"
+        } else {
+          val errors = result2.getErrors.getAllDeepValidationErrors.map(_.getMessage).mkString(", ")
+          errors
+        }
+      } else {
+        "payment success"
+      }
+    } else {
+      "Failed to create Braintree Customer"
     }
+
   }
 
   def javascriptRoutes() = mvc.Action { implicit request =>
