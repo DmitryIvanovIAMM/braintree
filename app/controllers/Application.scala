@@ -59,12 +59,7 @@ class Application @Inject()(val jsonFormatters: JsonFormatters,
   }
 
   private def getBraintreeGateway() = {
-    /*new BraintreeGateway(
-      queryBraintreeEnvironmentMode,
-      "twftwrbwd68gpj5p",                // merchantId
-      "2ywjzby9r4tny29w",                 // publicKey
-      "9fc65ee2ae3fdb3d904bdc00c991ead3"  // privateKey
-    )*/
+
     new BraintreeGateway(
       queryBraintreeEnvironmentMode,
       "zxb9qhkjv6dcwsmn",                // merchantId
